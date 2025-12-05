@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>EDWARD DEAN</title>
+
+<style>
+  body {
+    background: #f8f8f8;
+    padding: 40px;
+    text-align: center;
+    font-family: serif; /* ugly default font */
+  }
+
+  #intro, #gallery {
+    margin-top: 80px;
+  }
+
+  .box {
+    /* minimal, no border */
+  }
+
+  #artwork {
+    width: 300px;
+    cursor: pointer;
+    border: none;
+  }
+</style>
+</head>
+
+<body>
+
+<!-- INTRO SCREEN -->
+<div id="intro">
+  <div class="box">
+    <h1 style="font-size:32px; margin:0;">EDWARD DEAN</h1>
+  </div>
+</div>
+
+<!-- GALLERY SCREEN -->
+<div id="gallery" style="display:none;">
+  <div class="box">
+    <!-- BACK BUTTON -->
+    <button id="backButton" style="margin-bottom:20px; cursor:pointer;">BACK</button>
+    <!-- FIRST IMAGE -->
+    <img id="artwork" src="1.jpeg">
+  </div>
+</div>
+
+<script>
+  // Build a pool of unseen images: "1.jpeg" → "110.jpeg"
+  let pool = [];
+  for (let i = 1; i <= 110; i++) {
+    pool.push(i + ".jpeg");
+  }
+
+  const intro = document.getElementById("intro");
+  const gallery = document.getElementById("gallery");
+  const artwork = document.getElementById("artwork");
+  const backButton = document.getElementById("backButton");
+
+  // random click sounds
+  const clickSounds = [
+    new Audio("click1.wav"),
+    new Audio("click2.wav"),
+    new Audio("click3.wav"),
+    new Audio("click4.wav"),
+    new Audio("click5.wav"),
+    new Audio("click6.wav")
+  ];
+
+  function playRandomClick() {
+    const snd = clickSounds[Math.floor(Math.random() * clickSounds.length)];
+    snd.currentTime = 0;
+    snd.play();
+  }
+
+  // HISTORY
+  let history = [];
+  let historyIndex = -1;
+
+  // click name → enter site
+  intro.addEventListener("click", () => {
+    playRandomClick();
+    intro.style.display = "none";
+    gallery.style.display = "block";
+
+    // Show first image
+    const first = pool.shift(); // remove from pool
+    artwork.src = first;
+    history.push(first);
+    historyIndex = 0;
+  });
+
+  // click artwork → show NEXT unseen random image
+  artwork.addEventListener("click", () => {
+    playRandomClick();
+
+    // If no more images left, do nothing
+    if (pool.length === 0) return;
+
+    // pick random from pool
+    const randIndex = Math.floor(Math.random() * pool.length);
+    const next = pool[randIndex];
+
+    // show it
+    artwork.src = next;
+
+    // move from pool → history
+    pool.splice(randIndex, 1);
+    history.push(next);
+    historyIndex = history.length - 1;
+  });
+
+  // BACK BUTTON → go to previous image (if exists)
+  backButton.addEventListener("click", () => {
+    playRandomClick();
+
+    if (historyIndex > 0) {
+      historyIndex--;
+      artwork.src = history[historyIndex];
+    }
+  });
+</script>
+
+</body>
+</html>
